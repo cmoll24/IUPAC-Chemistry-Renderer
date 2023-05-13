@@ -1,6 +1,5 @@
-import turtle
-
 #Organic Chemistry
+import turtle
 import re
 
 prefixes = ['meth','eth','prop','but','pent','hex','hept','oct','non','dec','undec','dodec'] 
@@ -11,10 +10,17 @@ def valid(molecule):
     #BEHOLD MY MONSTROSITY
     Npre = '(' + '|'.join(prefixes) + ')'
     Gpre = '(' + '|'.join(greekL) + ')'
-    suf = '(' + '|'.join(suffixes) + ')'
-    ind = re.fullmatch(
-        r'((([0-9],?)+)-'+Gpre+'?'+Npre+'yl(-?))*'+Npre+'an'+'(-([0-9]+)-)?'+suf,
-        molecule)
+    suf = '(' + '|'.join(suffixes[0:]) + ')'
+    
+    nums = '(([0-9],?)+)-' #ex: 2,12,3,6
+    rams = nums+Gpre+'?'+Npre+'yl' #ex: 2,2-dimethyl
+    
+    groups = nums+Gpre+'?'+suf #ex: -2,3-diol
+    princ = Npre+'an(e|(-'+groups+'))' #ex: propane, butan-1,2-diol
+    
+    exp = r'('+rams+'(-?))*'+princ #3-ethyl-2,2-dimethylhexan-4,5-diol
+    
+    ind = re.fullmatch(exp,molecule)
 
     if ind == None:
         return False
@@ -62,7 +68,7 @@ for i in range(tempM.count('yl')):
     greek = getElt(greekL, tempM[size:])
     
     repeat = 1
-    if greek:
+    if greek and tempM[size+len(greek):size+len(greek)+2] != 'yl':
         repeat = greekL.index(greek)+2
         size += len(greek)
     
@@ -111,7 +117,7 @@ print(princ)
 
 
 wn = turtle.Screen()
-wn.bgcolor("#90EE90")
+wn.bgcolor("#eeeee4")
 wn.title("PC Organic Chemistry")
 #<-code from https://stackoverflow.com/questions/44775445/python-turtle-window-on-top
 rootwindow = wn.getcanvas().winfo_toplevel()
@@ -124,6 +130,7 @@ deg = 360/grid
 size = 50
 
 turt = turtle.Turtle()
+turt.pensize(2)
 turt.up()
 
 offset = -(princ[0]-1)*43
