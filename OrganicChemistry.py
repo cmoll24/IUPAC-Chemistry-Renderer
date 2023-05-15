@@ -10,21 +10,31 @@ def valid(molecule):
     #BEHOLD MY MONSTROSITY
     Npre = '(' + '|'.join(prefixes) + ')'
     Gpre = '(' + '|'.join(greekL) + ')'
-    suf = '(' + '|'.join(suffixes[0:]) + ')'
+    suf1 = '(' + '|'.join(suffixes[::2]) + ')' #suffixes that don't need a positional argument
+    suf2 = '(' + '|'.join(suffixes[1::2]) + ')' #suffixes that need a positional argument
     
     nums = '(([0-9],?)+)-' #ex: 2,12,3,6
     rams = nums+Gpre+'?'+Npre+'yl' #ex: 2,2-dimethyl
     
-    groups = nums+Gpre+'?'+suf #ex: -2,3-diol
-    princ = Npre+'an(e|(-'+groups+'))' #ex: propane, butan-1,2-diol
+    groups = nums+Gpre+'?'+suf2 #ex: -2,3-diol
+    princ = Npre+'an('+suf1+'|(-'+groups+'))' #ex: propane, methanoique, butan-1,2-diol
     
-    exp = r'('+rams+'(-?))*'+princ #3-ethyl-2,2-dimethylhexan-4,5-diol
+    exp = r'(acide )?('+rams+'(-?))*'+princ #3-ethyl-2,2-dimethylhexan-4,5-diol
     
     ind = re.fullmatch(exp,molecule)
 
     if ind == None:
         return False
     return True
+
+def removeAcide(mol):
+    if mol[:6] == 'acide ':
+        if mol[-5:] == suffixes[4]:
+            mol = mol[6:]
+        else:
+            print('ERROR not acide')
+    
+    return mol
 
 def getElt(liste, mol):
     for elt in liste:
@@ -45,7 +55,68 @@ def getList(link, string):
         liste.append(temp)
     return liste
 
+
+def drawMolecule(liste):
+    wn = turtle.Screen()
+    wn.bgcolor("#eeeee4")
+    wn.title("PC Organic Chemistry")
+    #<-code from https://stackoverflow.com/questions/44775445/python-turtle-window-on-top
+    rootwindow = wn.getcanvas().winfo_toplevel()
+    rootwindow.call('wm', 'attributes', '.', '-topmost', '1')
+    rootwindow.call('wm', 'attributes', '.', '-topmost', '0')
+    #->
+    
+    grid = 6
+    deg = 360/grid
+    size = 50
+
+    turt = turtle.Turtle()
+    turt.pensize(2)
+    turt.up()
+
+    offset = -(len(liste)-1)*43
+    turt.setx(offset/2)
+    
+    #DRAW FIRST LINK
+    turt.down()
+    print(liste[0],len(liste[0]))
+    if len(liste[0]) == 1:
+        turt.write(liste[0][0], align="center")
+        turt.seth(deg/2)
+        turt.forward(size)
+        
+    elif len(liste[0]) == 2:
+        turt.write(liste[0][0], align="center")
+        turt.seth(deg/2)
+        turt.forward(size)
+        turt.right(deg)
+        turt.backward(size)
+        turt.write(liste[0][1], align="center")
+        turt.forward(size)
+    turt.up()
+    turt.seth(deg/2)
+    
+    #DRAW CHAIN
+    for C in liste[0:]:
+        print(C,len(C))
+        
+        turt.down()
+        if turt.heading() < 180:
+            turt.right(deg)
+        else:
+            turt.left(deg)
+        turt.forward(size)
+        turt.up()
+    
+    turt.hideturtle()
+    turtle.done()
+    
+
 #------------------- PROGRAMME -------------------
+
+drawMolecule(
+    [['O','OH'],[],[]]
+    )
 
 while True:
     molecule = input("Insert molecule name: ")
@@ -55,9 +126,12 @@ while True:
     else:
         print("Please provide valid molecule.\n")
 
+#----------------- ANALYSING MOLECULE -----------------
+        
+tempM = removeAcide(molecule)
+
 #RAMMIFICATION
 rammify = []
-tempM = molecule
 
 for i in range(tempM.count('yl')):
     ind = tempM.find('-')
