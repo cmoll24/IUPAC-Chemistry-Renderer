@@ -6,6 +6,10 @@ prefixes = ['meth','eth','prop','but','pent','hex','hept','oct','non','dec','und
 greekL = ['di','tri','tetra'] + prefixes[4:]
 suffixes = ['e','ol','al','one','oique']
 
+GRID = 6
+DEG = 360/GRID
+SIZE = 50
+
 def valid(molecule):
     #BEHOLD MY MONSTROSITY
     Npre = '(' + '|'.join(prefixes) + ')'
@@ -55,6 +59,28 @@ def getList(link, string):
         liste.append(temp)
     return liste
 
+def sign(degrees):
+    if degrees > 180:
+        return -1
+    else:
+        return 1
+
+def drawElt(elt, t):
+    if type(elt) == str:
+        t.write(elt, align="center", font=('Arial', 12, 'bold'))
+    elif type(elt) == int:
+        tempPos = t.pos()
+        tempHead = t.heading()
+        d = 1
+        t.down()
+        for i in range(elt-1):
+            t.right(d*DEG)
+            d = -d
+            t.forward(SIZE)
+        t.up()
+        t.setpos(tempPos)
+        t.seth(tempHead)
+        t.down()
 
 def drawMolecule(liste):
     wn = turtle.Screen()
@@ -65,10 +91,6 @@ def drawMolecule(liste):
     rootwindow.call('wm', 'attributes', '.', '-topmost', '1')
     rootwindow.call('wm', 'attributes', '.', '-topmost', '0')
     #->
-    
-    grid = 6
-    deg = 360/grid
-    size = 50
 
     turt = turtle.Turtle()
     turt.pensize(2)
@@ -80,43 +102,77 @@ def drawMolecule(liste):
     #DRAW FIRST LINK
     turt.down()
     print(liste[0],len(liste[0]))
-    if len(liste[0]) == 1:
-        turt.write(liste[0][0], align="center")
-        turt.seth(deg/2)
-        turt.forward(size)
+    if len(liste[0]) >= 1:
+        drawElt(liste[0][0], turt)
+        turt.seth(DEG/2)
+        turt.forward(SIZE)
         
-    elif len(liste[0]) == 2:
-        turt.write(liste[0][0], align="center")
-        turt.seth(deg/2)
-        turt.forward(size)
-        turt.right(deg)
-        turt.backward(size)
-        turt.write(liste[0][1], align="center")
-        turt.forward(size)
+    if len(liste[0]) >= 2:
+        turt.right(DEG)
+        turt.backward(SIZE)
+        drawElt(liste[0][1], turt)
+        turt.forward(SIZE)
     turt.up()
-    turt.seth(deg/2)
+    turt.seth(DEG/2)
     
     #DRAW CHAIN
-    for C in liste[0:]:
+    for C in liste[1:-1]:
         print(C,len(C))
         
         turt.down()
         if turt.heading() < 180:
-            turt.right(deg)
+            turt.right(DEG)
         else:
-            turt.left(deg)
-        turt.forward(size)
+            turt.left(DEG)
+            
+        if len(C) >= 0:
+            turt.forward(SIZE)
+        if len(C) == 1:
+            turt.left(sign(turt.heading()) * 60)
+            turt.forward(SIZE)
+            drawElt(C[0], turt)
+            turt.backward(SIZE)
+            print(sign(turt.heading()))
+            turt.right(sign(turt.heading()) * 60)
+        if len(C) == 2:
+            turt.left(sign(turt.heading()) * 90)
+            turt.forward(SIZE)
+            drawElt(C[0], turt)
+            turt.backward(SIZE)
+            turt.right(sign(turt.heading()) * 180)
+            turt.forward(SIZE)
+            drawElt(C[1], turt)
+            turt.backward(SIZE)
+            turt.right(sign(turt.heading()) * 150)
         turt.up()
+        
+        
+    #DRAW LAST LINK
+    turt.down()
+    if turt.heading() < 180:
+        turt.right(DEG)
+    else:
+        turt.left(DEG)
     
+    if len(liste[-1]) == 0:
+        turt.forward(SIZE)
+    
+    if len(liste[-1]) >= 1:
+        drawElt(liste[-1][0], turt)
+        turt.seth(DEG/2)
+        turt.forward(SIZE)
+        
+    if len(liste[-1]) >= 2:
+        turt.backward(SIZE)
+        turt.right(DEG)
+        turt.forward(SIZE)
+        drawElt(liste[-1][-1], turt)
+    turt.up()
     turt.hideturtle()
     turtle.done()
     
 
 #------------------- PROGRAMME -------------------
-
-drawMolecule(
-    [['O','OH'],[],[]]
-    )
 
 while True:
     molecule = input("Insert molecule name: ")
@@ -186,55 +242,14 @@ suf = getElt(suffixes, tempM[ind+1:])
 
 val = prefixes.index(pre)+1
 group = suffixes.index(suf)
-princ = (val,pos,group)
-print(princ)
+print(val,pos,group)
 
+tableau = [[] for i in range(val)]
+for elt in rammify:
+    tableau[elt[0]-1].append(elt[1])
 
-wn = turtle.Screen()
-wn.bgcolor("#eeeee4")
-wn.title("PC Organic Chemistry")
-#<-code from https://stackoverflow.com/questions/44775445/python-turtle-window-on-top
-rootwindow = wn.getcanvas().winfo_toplevel()
-rootwindow.call('wm', 'attributes', '.', '-topmost', '1')
-rootwindow.call('wm', 'attributes', '.', '-topmost', '0')
-#->
+#for 
 
-grid = 6
-deg = 360/grid
-size = 50
+print(tableau)
 
-turt = turtle.Turtle()
-turt.pensize(2)
-turt.up()
-
-offset = -(princ[0]-1)*43
-turt.setx(offset/2)
-turt.seth(deg/2)
-
-Cpos = []
-
-direct = 1
-turt.down()
-for i in range(princ[0]-1):
-    Cpos.append((turt.pos(),direct))
-    turt.right(direct * deg)
-    turt.forward(size)
-    direct = -direct
-Cpos.append((turt.pos(),direct))
-turt.up()
-
-for ram in rammify:
-    C = Cpos[ram[0]-1]
-    turt.setpos(C[0])
-    turt.setheading(C[1] * 90)
-    
-    turt.down()
-    direct = 1
-    for i in range(ram[1]):
-        turt.forward(size)
-        turt.right(direct * deg)
-        direct = -direct
-    turt.up()
-        
-turt.hideturtle()
-turtle.done()
+drawMolecule([[],[1,'OH'],[],[2],[1],[]])
