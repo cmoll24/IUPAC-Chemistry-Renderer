@@ -4,7 +4,7 @@ import re
 
 prefixes = ['meth','eth','prop','but','pent','hex','hept','oct','non','dec','undec','dodec'] 
 greekL = ['di','tri','tetra'] + prefixes[4:]
-suffixes = ['e','ol','al','one','oique']
+suffixes = {'e':[],'ol':['OH'],'al':['O'],'one':['O'],'oique':['O','OH']}
 
 GRID = 6
 DEG = 360/GRID
@@ -14,8 +14,8 @@ def valid(molecule):
     #BEHOLD MY MONSTROSITY
     Npre = '(' + '|'.join(prefixes) + ')'
     Gpre = '(' + '|'.join(greekL) + ')'
-    suf1 = '(' + '|'.join(suffixes[::2]) + ')' #suffixes that don't need a positional argument
-    suf2 = '(' + '|'.join(suffixes[1::2]) + ')' #suffixes that need a positional argument
+    suf1 = '(' + '|'.join(list(suffixes)[::2]) + ')' #suffixes that don't need a positional argument
+    suf2 = '(' + '|'.join(list(suffixes)[1::2]) + ')' #suffixes that need a positional argument
     
     nums = '(([0-9],?)+)-' #ex: 2,12,3,6
     rams = nums+Gpre+'?'+Npre+'yl' #ex: 2,2-dimethyl
@@ -101,7 +101,6 @@ def drawMolecule(liste):
     
     #DRAW FIRST LINK
     turt.down()
-    print(liste[0],len(liste[0]))
     if len(liste[0]) >= 1:
         drawElt(liste[0][0], turt)
         turt.seth(DEG/2)
@@ -117,8 +116,6 @@ def drawMolecule(liste):
     
     #DRAW CHAIN
     for C in liste[1:-1]:
-        print(C,len(C))
-        
         turt.down()
         if turt.heading() < 180:
             turt.right(DEG)
@@ -239,17 +236,15 @@ if ind > 0:
     pos = int(tempM[:ind])
 
 suf = getElt(suffixes, tempM[ind+1:])
-
 val = prefixes.index(pre)+1
-group = suffixes.index(suf)
-print(val,pos,group)
+print(val,suf)
 
 tableau = [[] for i in range(val)]
 for elt in rammify:
     tableau[elt[0]-1].append(elt[1])
-
-#for 
+for atom in suffixes.get(suf):
+    tableau[pos-1].append(atom)
 
 print(tableau)
 
-drawMolecule([[],[1,'OH'],[],[2],[1],[]])
+drawMolecule(tableau)
