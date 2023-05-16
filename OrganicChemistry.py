@@ -149,7 +149,6 @@ def drawMolecule(liste):
             turt.forward(SIZE)
             drawElt(C[0], turt)
             turt.backward(SIZE)
-            print(sign(turt.heading()))
             turt.right(sign(turt.heading()) * 60)
         if len(C) == 2:
             turt.left(sign(turt.heading()) * 90)
@@ -187,7 +186,61 @@ def drawMolecule(liste):
     turt.up()
     turt.hideturtle()
     turtle.done()
+
+def parseMolecule(mol):
+    tempM = mol
     
+    #RAMMIFICATION
+    rammify = []
+
+    for i in range(tempM.count('yl')):
+        numb, tempM = getNumbs(tempM)
+        repeat, tempM= getRepeat(tempM)
+        
+        if len(numb) != repeat:
+            print("ERROR: {} doesn't match {}".format(len(numb),repeat))
+        
+        pre = getElt(prefixes, tempM)
+        tempM = tempM[len(pre):]
+        
+        val = prefixes.index(pre)+1
+        for i in range(repeat):
+            rammify.append((numb[i],val))
+        tempM = tempM[2:]
+        
+        if tempM[0] == '-':
+            tempM = tempM[1:]
+
+    print(rammify)
+
+    #CHAINE PRINCIPAL
+
+    print(tempM)
+
+    pre = getElt(prefixes, tempM)
+    tempM = tempM[len(pre) + 2:]
+
+    numb = [1] #when the ending is suf1
+    if tempM[0] == '-':
+        numb, tempM = getNumbs(tempM[1:])
+        repeat, tempM= getRepeat(tempM)
+        if len(numb) != repeat:
+            print("ERROR: {} doesn't match {}".format(len(numb),repeat))
+
+    suf = getElt(suffixes, tempM)
+
+    val = prefixes.index(pre)+1
+
+    tableau = [[] for i in range(val)]
+    for elt in rammify:
+        tableau[elt[0]-1].append(elt[1])
+
+    for i in numb:
+        for atom in suffixes.get(suf):
+            tableau[i-1].append(atom)
+    
+    return tableau
+
 
 #------------------- PROGRAMME -------------------
 
@@ -199,55 +252,7 @@ while True:
     else:
         print("Please provide valid molecule.\n")
 
-#RAMMIFICATION
-rammify = []
-tempM = molecule
-
-for i in range(tempM.count('yl')):
-    numb, tempM = getNumbs(tempM)
-    repeat, tempM= getRepeat(tempM)
-    
-    if len(numb) != repeat:
-        print("ERROR")
-    
-    pre = getElt(prefixes, tempM)
-    tempM = tempM[len(pre):]
-    
-    val = prefixes.index(pre)+1
-    for i in range(repeat):
-        rammify.append((numb[i],val))
-    tempM = tempM[2:]
-    
-    if tempM[0] == '-':
-        tempM = tempM[1:]
-
-print(rammify)
-
-#CHAINE PRINCIPAL
-
-print(tempM)
-
-pre = getElt(prefixes, tempM)
-tempM = tempM[len(pre) + 2:]
-
-numb = [1] #when the ending is suf1
-if tempM[0] == '-':
-    numb, tempM = getNumbs(tempM[1:])
-    repeat, tempM= getRepeat(tempM)
-    if len(numb) != repeat:
-        print("ERROR")
-
-suf = getElt(suffixes, tempM)
-
-val = prefixes.index(pre)+1
-
-tableau = [[] for i in range(val)]
-for elt in rammify:
-    tableau[elt[0]-1].append(elt[1])
-
-for i in numb:
-    for atom in suffixes.get(suf):
-        tableau[i-1].append(atom)
+tableau = parseMolecule(molecule)
 
 print(tableau)
 
