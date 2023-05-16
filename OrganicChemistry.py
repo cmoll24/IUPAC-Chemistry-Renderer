@@ -3,7 +3,7 @@ import turtle
 import re
 
 prefixes = ['meth','eth','prop','but','pent','hex','hept','oct','non','dec','undec','dodec'] 
-greekL = ['di','tri','tetra'] + prefixes[4:]
+greekL = ['di','tri','tetra'] + [elt + 'a' for elt in prefixes[4:]]
 suffixes = {'e':[],'ol':['OH'],'al':['O'],'one':['O'],'oique':['O','OH']}
 
 GRID = 6
@@ -63,6 +63,8 @@ def getNumbs(string):
     ind = string.find('-')
     numb = getList(',', string[:ind])
     string = string[ind+1:]
+    
+    numb = [int(elt) for elt in numb]
     
     return numb, string
 
@@ -190,7 +192,7 @@ def drawMolecule(liste):
 #------------------- PROGRAMME -------------------
 
 while True:
-    molecule = input("Insert molecule name: ")
+    molecule = input("Insert molecule name: ").lower()
 
     if valid(molecule):
         break
@@ -213,7 +215,7 @@ for i in range(tempM.count('yl')):
     
     val = prefixes.index(pre)+1
     for i in range(repeat):
-        rammify.append((int(numb[i]),val))
+        rammify.append((numb[i],val))
     tempM = tempM[2:]
     
     if tempM[0] == '-':
@@ -238,19 +240,15 @@ if tempM[0] == '-':
 suf = getElt(suffixes, tempM)
 
 val = prefixes.index(pre)+1
-princ = (val,numb,suf)
-print(princ)
 
 tableau = [[] for i in range(val)]
 for elt in rammify:
     tableau[elt[0]-1].append(elt[1])
 
 for i in numb:
-    print(i)
     for atom in suffixes.get(suf):
         tableau[i-1].append(atom)
 
 print(tableau)
 
 drawMolecule(tableau)
-
