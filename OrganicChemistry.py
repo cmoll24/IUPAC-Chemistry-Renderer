@@ -59,6 +59,23 @@ def getList(link, string):
         liste.append(temp)
     return liste
 
+def getNumbs(string):
+    ind = string.find('-')
+    numb = getList(',', string[:ind])
+    string = string[ind+1:]
+    
+    return numb, string
+
+def getRepeat(string):
+    greek = getElt(greekL, string)
+    
+    repeat = 1
+    if greek:
+        repeat = greekL.index(greek)+2
+        string = string[len(greek):]
+    
+    return repeat, string
+
 def sign(degrees):
     if degrees > 180:
         return -1
@@ -107,10 +124,11 @@ def drawMolecule(liste):
         turt.forward(SIZE)
         
     if len(liste[0]) >= 2:
-        turt.right(DEG)
+        turt.right(DEG*2)
         turt.backward(SIZE)
         drawElt(liste[0][1], turt)
         turt.forward(SIZE)
+        turt.left(DEG)
     turt.up()
     turt.seth(DEG/2)
     
@@ -179,43 +197,24 @@ while True:
     else:
         print("Please provide valid molecule.\n")
 
-#----------------- ANALYSING MOLECULE -----------------
-        
-tempM = removeAcide(molecule)
-
 #RAMMIFICATION
 rammify = []
+tempM = molecule
 
 for i in range(tempM.count('yl')):
-    ind = tempM.find('-')
-    numb = getList(',', tempM[:ind])
-    
-    size = ind + 1
-    
-    greek = getElt(greekL, tempM[size:])
-    
-    repeat = 1
-    if greek and tempM[size+len(greek):size+len(greek)+2] != 'yl':
-        repeat = greekL.index(greek)+2
-        size += len(greek)
+    numb, tempM = getNumbs(tempM)
+    repeat, tempM= getRepeat(tempM)
     
     if len(numb) != repeat:
         print("ERROR")
     
-    pre = getElt(prefixes, tempM[size:])
-    
-    if not pre:
-        break
-    
-    size += len(pre)
-    
-    if tempM[size:size+2] != 'yl':
-        break
+    pre = getElt(prefixes, tempM)
+    tempM = tempM[len(pre):]
     
     val = prefixes.index(pre)+1
     for i in range(repeat):
         rammify.append((int(numb[i]),val))
-    tempM = tempM[size+2:]
+    tempM = tempM[2:]
     
     if tempM[0] == '-':
         tempM = tempM[1:]
@@ -224,27 +223,34 @@ print(rammify)
 
 #CHAINE PRINCIPAL
 
+print(tempM)
+
 pre = getElt(prefixes, tempM)
 tempM = tempM[len(pre) + 2:]
 
+numb = [1] #when the ending is suf1
 if tempM[0] == '-':
-    tempM = tempM[1:]
+    numb, tempM = getNumbs(tempM[1:])
+    repeat, tempM= getRepeat(tempM)
+    if len(numb) != repeat:
+        print("ERROR")
 
-pos = 1
-ind = tempM.find('-')
-if ind > 0:
-    pos = int(tempM[:ind])
+suf = getElt(suffixes, tempM)
 
-suf = getElt(suffixes, tempM[ind+1:])
 val = prefixes.index(pre)+1
-print(val,suf)
+princ = (val,numb,suf)
+print(princ)
 
 tableau = [[] for i in range(val)]
 for elt in rammify:
     tableau[elt[0]-1].append(elt[1])
-for atom in suffixes.get(suf):
-    tableau[pos-1].append(atom)
+
+for i in numb:
+    print(i)
+    for atom in suffixes.get(suf):
+        tableau[i-1].append(atom)
 
 print(tableau)
 
 drawMolecule(tableau)
+
