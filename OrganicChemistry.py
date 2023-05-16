@@ -23,7 +23,7 @@ def valid(molecule):
     groups = nums+Gpre+'?'+suf2 #ex: -2,3-diol
     princ = Npre+'an('+suf1+'|(-'+groups+'))' #ex: propane, methanoique, butan-1,2-diol
     
-    exp = r'(acide )?('+rams+'(-?))*'+princ #3-ethyl-2,2-dimethylhexan-4,5-diol
+    exp = r'(acide )?('+rams+'(-?))*'+princ #3-ethyl-2,2-dimethylhexan-4,5-diol]
     
     ind = re.fullmatch(exp,molecule)
 
