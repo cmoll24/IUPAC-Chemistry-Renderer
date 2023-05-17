@@ -160,30 +160,30 @@ def drawMolecule(liste):
             drawElt(C[1], turt)
             turt.backward(SIZE)
             turt.right(sign(turt.heading()) * 150)
+        turt.up()  
+    
+    #DRAW LAST
+    if len(liste) > 1:
+        turt.down()
+        if turt.heading() < 180:
+            turt.right(DEG)
+        else:
+            turt.left(DEG)
+        
+        if len(liste[-1]) == 0:
+            turt.forward(SIZE)
+        
+        if len(liste[-1]) >= 1:
+            drawElt(liste[-1][0], turt)
+            turt.seth(DEG/2)
+            turt.forward(SIZE)
+            
+        if len(liste[-1]) >= 2:
+            turt.backward(SIZE)
+            turt.right(DEG)
+            turt.forward(SIZE)
+            drawElt(liste[-1][-1], turt)
         turt.up()
-        
-        
-    #DRAW LAST LINK
-    turt.down()
-    if turt.heading() < 180:
-        turt.right(DEG)
-    else:
-        turt.left(DEG)
-    
-    if len(liste[-1]) == 0:
-        turt.forward(SIZE)
-    
-    if len(liste[-1]) >= 1:
-        drawElt(liste[-1][0], turt)
-        turt.seth(DEG/2)
-        turt.forward(SIZE)
-        
-    if len(liste[-1]) >= 2:
-        turt.backward(SIZE)
-        turt.right(DEG)
-        turt.forward(SIZE)
-        drawElt(liste[-1][-1], turt)
-    turt.up()
     turt.hideturtle()
     turtle.done()
 
