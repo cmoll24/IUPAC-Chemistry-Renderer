@@ -133,26 +133,27 @@ def drawMolecule(liste):
         
         
     #DRAW LAST LINK
-    pendown()
-    if heading() < 180:
-        right(DEG)
-    else:
-        left(DEG)
-    
-    if len(liste[-1]) == 0:
-        forward(SIZE)
-    
-    if len(liste[-1]) >= 1:
-        drawElt(liste[-1][0])
-        setheading(DEG/2)
-        forward(SIZE)
+    if len(liste) > 1:
+        pendown()
+        if heading() < 180:
+            right(DEG)
+        else:
+            left(DEG)
         
-    if len(liste[-1]) >= 2:
-        backward(SIZE)
-        right(DEG)
-        forward(SIZE)
-        drawElt(liste[-1][-1])
-    penup()
+        if len(liste[-1]) == 0:
+            forward(SIZE)
+        
+        if len(liste[-1]) >= 1:
+            drawElt(liste[-1][0])
+            setheading(DEG/2)
+            forward(SIZE)
+            
+        if len(liste[-1]) >= 2:
+            backward(SIZE)
+            right(DEG)
+            forward(SIZE)
+            drawElt(liste[-1][-1])
+        penup()
     hideturtle()
 
 def parseMolecule(mol):
