@@ -245,14 +245,14 @@ def parseMolecule(mol):
 #------------------- PROGRAMME -------------------
 
 while True:
-    molecule = input("Insert molecule name: ").lower()
+    molecule_name = input("Insert molecule name: ").lower()
 
-    if valid(molecule):
+    if valid(molecule_name):
         break
     else:
         print("Please provide valid molecule.\n")
 
-tableau = parseMolecule(molecule)
+tableau = parseMolecule(molecule_name)
 
 print(tableau)
 
